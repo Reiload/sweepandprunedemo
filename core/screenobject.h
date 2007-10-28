@@ -9,85 +9,72 @@
 #ifndef _SCREENOBJECT_H_
 #define _SCREENOBJECT_H_
 
-#include <list>
+//#include <list>
+#include "gl.h"
+#include "glu.h"
+#include "glut.h"
 #include "utilities.h"
 #include "csc3406.h"
 #include "l3ds.h"
-using std::list;
+//using std::list;
 
-namespace Sea {	
-	
-	class Fish {
+class Vector3;
+
+
+
+namespace SweepAndPrune {	
+	class Box{
 	public:
-		// Constructor
-		Fish(const Vector3 p, const Vector3 d, const GLfloat s, const float si, GLfloat* col) :
-		pos(p), dir(d), speed(s), size(si), color(col) {
-			dir.normalize();
-			FishList().push_back(this);
+		Box(const Vector3 mins1, const Vector3 maxs1, const GLfloat* col) : 
+		  mins(mins1), maxs(maxs1), colour(col) {}
+		void Draw(){
+			GLfloat minX = mins.GetX();
+			GLfloat minY = mins.GetY();
+			GLfloat minZ = mins.GetZ();
+			GLfloat maxX = maxs.GetX();
+			GLfloat maxY = maxs.GetY();
+			GLfloat maxZ = maxs.GetZ();
+			glPushMatrix();
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, colour);
+				glBegin(GL_QUADS);
+					glVertex3f(minX, minY, minZ);
+					glVertex3f(maxX, minY, minZ);
+					glVertex3f(maxX, maxY, minZ);
+					glVertex3f(minX, maxY, minZ);
+					
+					glVertex3f(minX, minY, maxZ);
+					glVertex3f(maxX, minY, maxZ);
+					glVertex3f(maxX, maxY, maxZ);
+					glVertex3f(minX, maxY, maxZ);
+
+					glVertex3f(minX, minY, minZ);
+					glVertex3f(minX, minY, maxZ);
+					glVertex3f(minX, maxY, maxZ);
+					glVertex3f(minX, maxY, minZ);
+					
+					glVertex3f(maxX, minY, minZ);
+					glVertex3f(maxX, minY, maxZ);
+					glVertex3f(maxX, maxY, maxZ);
+					glVertex3f(maxX, maxY, minZ);
+
+					glVertex3f(minX, minY, minZ);
+					glVertex3f(minX, minY, maxZ);
+					glVertex3f(maxX, minY, maxZ);
+					glVertex3f(maxX, minY, minZ);
+
+					glVertex3f(minX, maxY, minZ);
+					glVertex3f(minX, maxY, maxZ);
+					glVertex3f(maxX, maxY, maxZ);
+					glVertex3f(maxX, maxY, minZ);
+
+				glEnd();
+			glPopMatrix();
 		}
-		// Destructor
-		~Fish() {
-			FishList().remove(this);
-		}	
-		// Get Position
-		const Vector3& GetPos() const { return pos; }
-		// Get Direction Vector
-		const Vector3& GetDir() const { return dir; }
-		// Get Speed
-		GLfloat GetSpeed() const { return speed; }
-		// Get Size
-		float GetSize() const { return size; }
-		// Get Position
-		void SetPos(Vector3& p) { pos = p; }
-		// Set Direction
-		void Setdir(Vector3& v) { dir = v; }
-		// Normalize Direction Vector
-		void NormalizeDir() { dir.normalize();}
-		// Set Fish Speed
-		void SetSpeed(GLfloat s) { speed = s; }
-		// Move fish
-		void Move(float xMin, float xMax, float yMin, float yMax, float zMin, float zMax);
-		// Draw all fish
-		static void DrawAll() {
-			list<Fish*>::const_iterator it = FishList().begin();
-			for (; it != FishList().end(); ++it) {
-				(*it)->Draw();
-			}
-		}
-		// Move all objects
-		static void MoveAll(float xMin, float xMax, float yMin, float yMax, float zMin, float zMax) {
-			list<Fish*>::const_iterator it = FishList().begin();
-			for (; it != FishList().end(); ++it) {
-				(*it)->Move(xMin, xMax, yMin, yMax, zMin, zMax);
-			}
-		}	
-		// Load L3DS file
-		static void File(const char *filename){
-			Scene() = new L3DS();
-			Scene()->LoadFile(filename);
-		}
-		void Draw(); 	
-	protected:
-		Vector3	pos; // Vector to position from origin
-		Vector3 dir; // Vector showing direction of travel
-		GLfloat speed; // How fast fish is moving
-		float size; // Size
-		GLfloat* color;  // Color
-		// The following functions ensure that static variable are initialised when called
-		static list<Fish*>&  FishList() {	
-			static list<Fish*> FishList;	// static list of all ScreenObject objects
-			return FishList;
-		}
-		static L3DS*& Scene() {
-			static L3DS *scene;
-			return scene;
-		}
+	private:
+		Vector3 mins; // minimum co-ordinates of the box
+		Vector3 maxs; // maximum co-ordinates of the box
+		const GLfloat* colour; // colour of the box
 	};
-
-
-
-
-
 }
 #endif
 	
