@@ -19,11 +19,11 @@
 #include "camera.h"
 #include "shadow.h"
 #include "l3ds.h"
-//#include "screenobject.h"
+#include "screenobject.h"
 #include "utilities.h"
 
 
-using namespace Sea;
+using namespace SweepAndPrune;
 
 
 //used for glut init
@@ -37,6 +37,8 @@ FileReadWriter fileHandler;
 WindowSetup settings;
 
 /*** Global Variables ***/
+GLfloat colors1[4] = {0.8, 0.0, 0.0, 1.0};
+Box Box1(Vector3(1.0, 1.0, 1.0), Vector3(2.0, 2.0, 2.0), colors1);
 
 // Window Dimensions
 int windowWidth, windowHeight;
@@ -166,15 +168,19 @@ void render(void)
 	glEnable(GL_CLIP_PLANE0);
 	double eqr[] = { 0.0, -1.0, 0.0, 0.0 };
 	glClipPlane(GL_CLIP_PLANE0, eqr);
+	glPushMatrix();
+		Box1.Draw();
+	glPopMatrix();
 	/*glPushMatrix();
 		glScaled(1.0f, -1.0f, 1.0f);
+		
 		drawObjects();			
 	glPopMatrix();*/
 	glDisable(GL_CLIP_PLANE0);
 	
 	//// Draw foreground coral and fish
 	//drawObjects();
-	
+	Box1.Draw();
 	// Draw semi-transparent floor to screne and stencil buffer
 	glDisable(GL_LIGHTING); 
 	glEnable(GL_BLEND);
@@ -195,6 +201,7 @@ void render(void)
 		glMultMatrixf((GLfloat *) shadowMat);
 		glStencilFunc(GL_EQUAL, 0x3, 0x2);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		Box1.Draw();
 	//	drawObjects();
 	glPopMatrix();
 
@@ -224,6 +231,30 @@ void myKeyboard(unsigned char c, int x, int y)
 {
 	switch (c)
 	{
+		case 'w' : 
+			cam.pitch(-10.0);
+			break;
+		case 'W' :
+			cam.pitch(-10.0);
+			break;
+		case 's' : 
+			cam.pitch(10.0);
+			break;
+		case 'S' :
+			cam.pitch(10.0);
+			break;
+		case 'a' :
+			cam.yaw(-10.0);	
+			break;
+		case 'A' :
+			cam.yaw(-10.0);	
+			break;
+		case 'd' :
+			cam.yaw(10.0);	
+			break;
+		case 'D' :
+			cam.yaw(10.0);	
+			break;
 	case 27:
 		exit(0);
 		break;
@@ -292,7 +323,6 @@ int main()
 	//new Fish(Vector3(1.0, 1.1, 1.0), Vector3(1, 0.01, 0.01), 0.05, 0.1, colors1);
 	//new Fish(Vector3(1.0, 1.1, -1.0), Vector3(0.1, 0.1, 0.1), 0.05, 0.04, colors2);
 	//new Fish(Vector3(-1.0, 1.5, 0.0), Vector3(0.1, 0.1, 0.1), 0.01, 0.3, colors3);
-	
 	
 	
 	glutMainLoop();
