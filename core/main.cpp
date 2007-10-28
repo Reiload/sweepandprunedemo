@@ -40,6 +40,8 @@ WindowSetup settings;
 GLfloat colors1[4] = {0.8, 0.0, 0.0, 1.0};
 Box Box1(Vector3(1.0, 1.0, 1.0), Vector3(2.0, 2.0, 2.0), colors1);
 
+const GLfloat INC = 0.2;
+
 // Window Dimensions
 int windowWidth, windowHeight;
 
@@ -84,22 +86,6 @@ void drawFloor(void) {
 		glEnd();
 	glPopMatrix();
 }
-
-///*** Draw Fish and Foreground Coral ***/
-//void drawObjects(void) {
-//	Fish::MoveAll(XMIN * 0.8, XMAX * 0.8, YMIN * 0.8, YMAX * 0.8, ZMIN * 0.8, ZMAX * 0.8);
-//	Fish::DrawAll();
-//	//glPushMatrix();
-//	//	glTranslated((XMAX-XMIN)*3.0/4.0 + XMIN, YMIN, (ZMAX-ZMIN)*3.0/4.0+ ZMIN);
-//	//	coral1.Draw();
-//	//glPopMatrix();
-//	//glPushMatrix();
-//	//	glTranslated((XMAX-XMIN)*1.0/4.0 + XMIN, YMIN, (ZMAX-ZMIN)*3.0/4.0+ ZMIN);
-//	//	glRotatef(190.0,0.0,1.0,0.0);
-//	//	glScalef(0.5,0.5,0.5);
-//	//	coral2.Draw();
-//	glPopMatrix();
-//}
 
 /*** Handle Window Reshaping ***/
 void myReshape(int w, int h)
@@ -171,15 +157,10 @@ void render(void)
 	glPushMatrix();
 		Box1.Draw();
 	glPopMatrix();
-	/*glPushMatrix();
-		glScaled(1.0f, -1.0f, 1.0f);
-		
-		drawObjects();			
-	glPopMatrix();*/
+	
 	glDisable(GL_CLIP_PLANE0);
 	
-	//// Draw foreground coral and fish
-	//drawObjects();
+	// Draw Boxs
 	Box1.Draw();
 	// Draw semi-transparent floor to screne and stencil buffer
 	glDisable(GL_LIGHTING); 
@@ -226,34 +207,69 @@ void myDisplay(void) {
 	glutSwapBuffers();
 }
 
+
+void mySpecialKeyboardFunc(int key, int x, int y)
+{
+	if(key == GLUT_KEY_LEFT)
+	{
+		
+	}
+	else if(key == GLUT_KEY_RIGHT)
+	{
+		
+	}
+	else if(key == GLUT_KEY_UP)
+	{
+			Box1.MoveY(INC);
+			Box1.SetDir(YPOS);
+			
+	}
+	else if(key == GLUT_KEY_DOWN)
+	{
+			Box1.MoveY(-INC);
+			Box1.SetDir(YNEG);
+			
+	}
+	glutPostRedisplay();
+	
+}
+
 /*** Handle Keyboard ***/
 void myKeyboard(unsigned char c, int x, int y)
 {
 	switch (c)
 	{
 		case 'w' : 
-			cam.pitch(-10.0);
+			Box1.MoveZ(-INC);
+			Box1.SetDir(ZNEG);
 			break;
 		case 'W' :
-			cam.pitch(-10.0);
+			Box1.MoveZ(-INC);
+			Box1.SetDir(ZNEG);
 			break;
 		case 's' : 
-			cam.pitch(10.0);
+			Box1.MoveZ(INC);
+			Box1.SetDir(ZPOS);
 			break;
 		case 'S' :
-			cam.pitch(10.0);
+			Box1.MoveZ(INC);
+			Box1.SetDir(ZPOS);
 			break;
 		case 'a' :
-			cam.yaw(-10.0);	
+			Box1.MoveX(-INC);
+			Box1.SetDir(XNEG);
 			break;
 		case 'A' :
-			cam.yaw(-10.0);	
+			Box1.MoveX(-INC);
+			Box1.SetDir(XNEG);
 			break;
 		case 'd' :
-			cam.yaw(10.0);	
+			Box1.MoveX(INC);
+			Box1.SetDir(XPOS);
 			break;
 		case 'D' :
-			cam.yaw(10.0);	
+			Box1.MoveX(INC);
+			Box1.SetDir(XPOS);
 			break;
 	case 27:
 		exit(0);
@@ -290,6 +306,7 @@ int main()
 
 	glutReshapeFunc(myReshape);
 	glutDisplayFunc(myDisplay);
+	glutSpecialFunc(mySpecialKeyboardFunc);
 	glutKeyboardFunc(myKeyboard);
 	glutIdleFunc(myIdle);	
 
