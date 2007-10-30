@@ -38,7 +38,7 @@ WindowSetup settings;
 
 /*** Global Variables ***/
 GLfloat colors1[4] = {0.8, 0.0, 0.0, 1.0};
-Box Box1(Vector3(1.0, 1.0, 1.0), Vector3(2.0, 2.0, 2.0), colors1);
+ToyBlocks ToyBlocks1(Vector3(1.0, 1.0, 1.0), Vector3(2.0, 2.0, 2.0), colors1);
 
 const GLfloat INC = 0.2;
 
@@ -155,13 +155,13 @@ void render(void)
 	double eqr[] = { 0.0, -1.0, 0.0, 0.0 };
 	glClipPlane(GL_CLIP_PLANE0, eqr);
 	glPushMatrix();
-		Box1.Draw();
+		ToyBlocks1.Draw();
 	glPopMatrix();
 	
 	glDisable(GL_CLIP_PLANE0);
 	
-	// Draw Boxs
-	Box1.Draw();
+	// Draw ToyBlockss
+	ToyBlocks1.Draw();
 	// Draw semi-transparent floor to screne and stencil buffer
 	glDisable(GL_LIGHTING); 
 	glEnable(GL_BLEND);
@@ -182,7 +182,7 @@ void render(void)
 		glMultMatrixf((GLfloat *) shadowMat);
 		glStencilFunc(GL_EQUAL, 0x3, 0x2);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-		Box1.Draw();
+		ToyBlocks1.Draw();
 	//	drawObjects();
 	glPopMatrix();
 
@@ -220,14 +220,14 @@ void mySpecialKeyboardFunc(int key, int x, int y)
 	}
 	else if(key == GLUT_KEY_UP)
 	{
-			Box1.MoveY(INC);
-			Box1.SetDir(YPOS);
+			ToyBlocks1.MoveY(INC);
+			ToyBlocks1.SetDirectionOfTravel(YPOS);
 			
 	}
 	else if(key == GLUT_KEY_DOWN)
 	{
-			Box1.MoveY(-INC);
-			Box1.SetDir(YNEG);
+			ToyBlocks1.MoveY(-INC);
+			ToyBlocks1.SetDirectionOfTravel(YNEG);
 			
 	}
 	glutPostRedisplay();
@@ -240,36 +240,36 @@ void myKeyboard(unsigned char c, int x, int y)
 	switch (c)
 	{
 		case 'w' : 
-			Box1.MoveZ(-INC);
-			Box1.SetDir(ZNEG);
+			ToyBlocks1.MoveZ(-INC);
+			ToyBlocks1.SetDirectionOfTravel(ZNEG);
 			break;
 		case 'W' :
-			Box1.MoveZ(-INC);
-			Box1.SetDir(ZNEG);
+			ToyBlocks1.MoveZ(-INC);
+			ToyBlocks1.SetDirectionOfTravel(ZNEG);
 			break;
 		case 's' : 
-			Box1.MoveZ(INC);
-			Box1.SetDir(ZPOS);
+			ToyBlocks1.MoveZ(INC);
+			ToyBlocks1.SetDirectionOfTravel(ZPOS);
 			break;
 		case 'S' :
-			Box1.MoveZ(INC);
-			Box1.SetDir(ZPOS);
+			ToyBlocks1.MoveZ(INC);
+			ToyBlocks1.SetDirectionOfTravel(ZPOS);
 			break;
 		case 'a' :
-			Box1.MoveX(-INC);
-			Box1.SetDir(XNEG);
+			ToyBlocks1.MoveX(-INC);
+			ToyBlocks1.SetDirectionOfTravel(XNEG);
 			break;
 		case 'A' :
-			Box1.MoveX(-INC);
-			Box1.SetDir(XNEG);
+			ToyBlocks1.MoveX(-INC);
+			ToyBlocks1.SetDirectionOfTravel(XNEG);
 			break;
 		case 'd' :
-			Box1.MoveX(INC);
-			Box1.SetDir(XPOS);
+			ToyBlocks1.MoveX(INC);
+			ToyBlocks1.SetDirectionOfTravel(XPOS);
 			break;
 		case 'D' :
-			Box1.MoveX(INC);
-			Box1.SetDir(XPOS);
+			ToyBlocks1.MoveX(INC);
+			ToyBlocks1.SetDirectionOfTravel(XPOS);
 			break;
 	case 27:
 		exit(0);

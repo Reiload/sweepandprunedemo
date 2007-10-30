@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\element.h"
+				>
+			</File>
+			<File
 				RelativePath=".\screenobject.h"
 				>
 			</File>

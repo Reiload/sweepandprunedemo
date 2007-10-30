@@ -16,36 +16,53 @@ Fish Class represents an individual fish in the ocean scene
 #include "utilities.h"
 #include "csc3406.h"
 #include "l3ds.h"
+#include "element.h"
+
 
 
 namespace SweepAndPrune {	
 
-	enum DIR { XNEG, XPOS, YNEG, YPOS, ZNEG, ZPOS, NONE };
+	class Element;
 
-	class Box{
+	class AABB{
 	public:
-		Box(const Vector3 mins1, const Vector3 maxs1, const GLfloat* col) : 
-		  mins(mins1), maxs(maxs1), colour(col), lastDir(NONE) {
+		AABB(const Vector3 mins1, const Vector3 maxs1) {
+			minElement = new Element(this, mins1); 
+			maxElement = new Element(this, maxs1);
+		}
+	protected:
+		Element* minElement;
+		Element* maxElement;
+	};
+
+	
+
+	enum DIRECTION_OF_TRAVEL { XNEG, XPOS, YNEG, YPOS, ZNEG, ZPOS, NONE }; // these are the directions the ToyBlocks can moving in
+
+	class ToyBlocks : public AABB{
+	public:
+		ToyBlocks(const Vector3 mins1, const Vector3 maxs1, const GLfloat* col) : 
+		  AABB(mins1, maxs1), colour(col), lastDirection(NONE) {
 		  }
 		  void MoveX(GLfloat x) {
-			  mins.SetX(mins.GetX() + x);
-			  maxs.SetX(maxs.GetX() + x);
+			  minElement->SetX(minElement->GetX() + x);
+			  maxElement->SetX(maxElement->GetX() + x);
 		  }
 		  void MoveY(GLfloat y) {
-			  mins.SetY(mins.GetY() + y);
-			  maxs.SetY(maxs.GetY() + y);
+			  minElement->SetY(minElement->GetY() + y);
+			  maxElement->SetY(maxElement->GetY() + y);
 		  }
 		  void MoveZ(GLfloat z) {
-			  mins.SetZ(mins.GetZ() + z);
-			  maxs.SetZ(maxs.GetZ() + z);
+			  minElement->SetZ(minElement->GetZ() + z);
+			  maxElement->SetZ(maxElement->GetZ() + z);
 		  }
 		  void Draw(){
-			  GLfloat minX = mins.GetX();
-			  GLfloat minY = mins.GetY();
-			  GLfloat minZ = mins.GetZ();
-			  GLfloat maxX = maxs.GetX();
-			  GLfloat maxY = maxs.GetY();
-			  GLfloat maxZ = maxs.GetZ();
+			  GLfloat minX = minElement->GetX();
+			  GLfloat minY = minElement->GetY();
+			  GLfloat minZ = minElement->GetZ();
+			  GLfloat maxX = maxElement->GetX();
+			  GLfloat maxY = maxElement->GetY();
+			  GLfloat maxZ = maxElement->GetZ();
 			  glPushMatrix();
 			  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, colour);
 			  glBegin(GL_QUADS);
@@ -82,28 +99,14 @@ namespace SweepAndPrune {
 			  glEnd();
 			  glPopMatrix();
 		  }
-		  void SetDir(DIR dir) {lastDir = dir;}
-		  DIR GetDir() const {return lastDir;}
+		  void SetDirectionOfTravel(DIRECTION_OF_TRAVEL dir) {lastDirection = dir;}
+		  DIRECTION_OF_TRAVEL GetDirectionOfTravel() const {return lastDirection;}
 	private:
-		DIR lastDir; // last direction of movement
-		Vector3 mins; // minimum co-ordinates of the box
-		Vector3 maxs; // maximum co-ordinates of the box
-		const GLfloat* colour; // colour of the box
-
+		DIRECTION_OF_TRAVEL lastDirection; // records the direction that the cube is try to move in	
+		const GLfloat* colour; // colour of the ToyBlocks
 	};
 
-	struct Elem {
-		Elem *pLeft[3];  // Pointers to the previous linked list element (one for each axis)
-		Elem *pRight[3]; // Pointers to the next linked list element (one for each axis)
-		float value[3];  // All min or all max coordinate values (one for each axis)
-		int   minmax:1;  // All min values or all max values?
-	};
 
-	struct AABB {
-		Elem min;        // Element containing the three minimum interval values
-		Elem max;        // Element containing the three maximum interval values
-		Box *pObj;    // Pointer to the actual object contained in the AABB
-	};
 }
 
 #endif
