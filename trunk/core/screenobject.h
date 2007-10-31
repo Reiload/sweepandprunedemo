@@ -9,7 +9,8 @@ Fish Class represents an individual fish in the ocean scene
 #ifndef _SCREENOBJECT_H_
 #define _SCREENOBJECT_H_
 
-
+#include <list>
+#include <utility>
 #include "gl.h"
 #include "glu.h"
 #include "glut.h"
@@ -26,15 +27,25 @@ namespace SweepAndPrune {
 
 	class AABB{
 	public:
+		
 		AABB(const Vector3 mins1, const Vector3 maxs1) {
-			minElement = new Element(this, mins1); 
-			maxElement = new Element(this, maxs1);
+			minElement = new Element(this, mins1, false); 
+			maxElement = new Element(this, maxs1, true);
+
 		}
+		
 	protected:
 		Element* minElement;
 		Element* maxElement;
+		static std::list< std::pair<AABB*, AABB*> >& CollisionPairs() {
+			static std::list< std::pair<AABB*, AABB*> > CollisionPairs;
+			return CollisionPairs;
+		}
 	};
 
+	
+
+	
 	
 
 	enum DIRECTION_OF_TRAVEL { XNEG, XPOS, YNEG, YPOS, ZNEG, ZPOS, NONE }; // these are the directions the ToyBlocks can moving in

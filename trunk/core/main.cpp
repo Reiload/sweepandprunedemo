@@ -40,6 +40,9 @@ WindowSetup settings;
 GLfloat colors1[4] = {0.8, 0.0, 0.0, 1.0};
 ToyBlocks ToyBlocks1(Vector3(1.0, 1.0, 1.0), Vector3(2.0, 2.0, 2.0), colors1);
 
+GLfloat colors2[4] = {0.8, 0.8, 0.0, 1.0};
+ToyBlocks ToyBlocks2(Vector3(-1.0, 1.0, 1.0), Vector3(-2.0, 2.0, 2.0), colors2);
+
 const GLfloat INC = 0.2;
 
 // Window Dimensions
@@ -156,12 +159,14 @@ void render(void)
 	glClipPlane(GL_CLIP_PLANE0, eqr);
 	glPushMatrix();
 		ToyBlocks1.Draw();
+		ToyBlocks2.Draw();
 	glPopMatrix();
 	
 	glDisable(GL_CLIP_PLANE0);
 	
 	// Draw ToyBlockss
 	ToyBlocks1.Draw();
+	ToyBlocks2.Draw();
 	// Draw semi-transparent floor to screne and stencil buffer
 	glDisable(GL_LIGHTING); 
 	glEnable(GL_BLEND);
@@ -183,6 +188,7 @@ void render(void)
 		glStencilFunc(GL_EQUAL, 0x3, 0x2);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		ToyBlocks1.Draw();
+		ToyBlocks2.Draw();
 	//	drawObjects();
 	glPopMatrix();
 
@@ -302,7 +308,7 @@ int main()
 	glutInitWindowSize(settings.SCREENWIDTH, settings.SCREENHEIGHT);
 
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("I want to be under the sea...");
+	glutCreateWindow("Playing with my blocks");
 
 	glutReshapeFunc(myReshape);
 	glutDisplayFunc(myDisplay);
