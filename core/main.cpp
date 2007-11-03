@@ -40,8 +40,9 @@ WindowSetup settings;
 GLfloat colors1[4] = {0.8, 0.0, 0.0, 1.0};
 ToyBlocks ToyBlocks1(Vector3(1.0, 1.0, 1.0), Vector3(2.0, 2.0, 2.0), colors1);
 
+
 GLfloat colors2[4] = {0.8, 0.8, 0.0, 1.0};
-ToyBlocks ToyBlocks2(Vector3(-1.0, 1.0, 1.0), Vector3(-2.0, 2.0, 2.0), colors2);
+ToyBlocks ToyBlocks2(Vector3(-2.0, 1.0, 1.0), Vector3(-1.0, 2.0, 2.0), colors2);
 
 const GLfloat INC = 0.2;
 
@@ -339,8 +340,8 @@ int main()
 	N[1] = 0.0;
 	N[2] = 0.3;
 
-	std::cout << "Starting program, this may take some time..." << std::endl;
-
+	
+	ToyBlocks2.SetMovable();
 	//// Create 3 Fish objects
 	//Fish::File("Fish.3ds");
 	//new Fish(Vector3(1.0, 1.1, 1.0), Vector3(1, 0.01, 0.01), 0.05, 0.1, colors1);
