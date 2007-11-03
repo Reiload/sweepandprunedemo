@@ -11,6 +11,7 @@ Fish Class represents an individual fish in the ocean scene
 
 #include <list>
 #include <utility>
+#include <iostream>
 #include "gl.h"
 #include "glu.h"
 #include "glut.h"
@@ -26,16 +27,19 @@ namespace SweepAndPrune {
 	class Element;
 
 	class Overlap {
+	public:
 		Overlap(AABB* p1, AABB* p2) : pAABB1(p1), pAABB2(p2), counter(0) {}
 		bool MarkOverlap() {
+			
 			counter++;
 			if(counter == 3) {
+			
 				return true;
 			} else {
 				return false;
 			}
 		}
-		bool IsOverlap() const {
+		bool IsCollision() const {
 			if(counter == 3) {
 				return true;
 			} else {
@@ -49,6 +53,35 @@ namespace SweepAndPrune {
 				return false;
 			}
 		}
+		static std::list< Overlap* >& OverlapList() {
+			static std::list< Overlap* > OverlapList;
+			return OverlapList;
+		}
+		static void CleanOverlapList() {
+			std::list< Overlap* >::iterator it = OverlapList().begin();
+			for (; it != OverlapList().end(); ++it) {
+				delete (*it);
+			}
+			OverlapList().clear();
+		}
+		static void UpdateList(AABB* p1, AABB* p2) {
+			std::list< Overlap* >::iterator it = OverlapList().begin();
+			for (; it != OverlapList().end(); ++it) {
+				if(	(*it)->SamePair(p1, p2)	) {
+					(*it)->MarkOverlap();
+					break;
+				}
+			}
+			Overlap* temp = new Overlap(p1, p2);
+			temp->MarkOverlap();
+			OverlapList().push_back( temp );
+		}
+		inline AABB* GetFirstAABB() const {
+			return pAABB1;
+		}
+		inline AABB* GetSecondAABB() const {
+			return pAABB2;
+		}
 	private:
 		AABB* pAABB1;
 		AABB* pAABB2;
@@ -57,8 +90,8 @@ namespace SweepAndPrune {
 
 	class AABB{
 	public:
-		
-		AABB(const Vector3 mins1, const Vector3 maxs1) {
+
+		AABB(const Vector3 mins1, const Vector3 maxs1) : movable(false) {
 			minElement = new Element(this, mins1, false); 
 			maxElement = new Element(this, maxs1, true);
 		}
@@ -71,100 +104,130 @@ namespace SweepAndPrune {
 		inline void Move(const Vector3 newPosition) {
 			UpdateList(this, newPosition);
 		}
+		inline Vector3* CreatePositionVector() const {
+			return new Vector3(
+				(minElement->GetX() + maxElement->GetX())/2.0, 
+				(minElement->GetY() + maxElement->GetY())/2.0, 
+				(minElement->GetZ() + maxElement->GetZ())/2.0
+				);
+		}
+		inline bool isMovable() const {
+			return movable;
+		}
+		inline void SetMovable() {
+			movable = true;
+		}
 	protected:
 		Element* minElement;
 		Element* maxElement;
-		static std::list< std::pair<AABB*, AABB*>* >& CollisionPairs() {
-			static std::list< std::pair<AABB*, AABB*>* > CollisionPairs;
-			return CollisionPairs;
-		}
-		static void AddCollisionPair(AABB* pAABB1, AABB* pAABB2) {
-			CollisionPairs().push_back( new std::pair< AABB*, AABB* > (pAABB1, pAABB2 ) );
-		}
-		static void UpdateList(AABB* pAABB, const Vector3 newPosition) {
+		bool movable;
+
+		static void UpdateList(AABB* pAABB, const Vector3 deltaPosition) {
 			Element* tempElement;
 			tempElement = pAABB->GetMinElement();
 			Element::RemoveFromList(tempElement);
-			tempElement->SetX( tempElement->GetX() + newPosition.GetX() );
-			tempElement->SetY( tempElement->GetY() + newPosition.GetY() );
-			tempElement->SetZ( tempElement->GetZ() + newPosition.GetZ() );
+			tempElement->SetX( tempElement->GetX() + deltaPosition.GetX() );
+			tempElement->SetY( tempElement->GetY() + deltaPosition.GetY() );
+			tempElement->SetZ( tempElement->GetZ() + deltaPosition.GetZ() );
 			Element::InsertIntoList(tempElement, tempElement->GetIsMax());
 
 			tempElement = pAABB->GetMaxElement();
 			Element::RemoveFromList(tempElement);
-			tempElement->SetX( tempElement->GetX() + newPosition.GetX() );
-			tempElement->SetY( tempElement->GetY() + newPosition.GetY() );
-			tempElement->SetZ( tempElement->GetZ() + newPosition.GetZ() );
+			tempElement->SetX( tempElement->GetX() + deltaPosition.GetX() );
+			tempElement->SetY( tempElement->GetY() + deltaPosition.GetY() );
+			tempElement->SetZ( tempElement->GetZ() + deltaPosition.GetZ() );
 			Element::InsertIntoList(tempElement, tempElement->GetIsMax());
+			DetectCollisions();
 
 		}
-	/*	bool isOverlapping(AABB* pAABB1, AABB* pAABB2) {
-			float minX1 = pAABB1->minElement->GetX();
-			float minY1 = pAABB1->minElement->GetY();
-			float minZ1 = pAABB1->minElement->GetZ();
+		static void DetectCollisions() {	
+			Overlap::CleanOverlapList();
+			std::list< Element* > tempScanList;
+			std::list< Element* >::iterator it3 = tempScanList.begin();
+			std::list< Element* >::iterator it2 = Element::ElementListX().begin();
+			for (; it2 != Element::ElementListX().end(); ++it2) {
+				
+				if( (*it2)->GetIsMax()) {
+					tempScanList.remove( ((*it2)->GetAABB())->GetMinElement() );
+				} else {
+					it3 = tempScanList.begin();
+					for(; it3 != tempScanList.end(); ++it3) {
+						Overlap::UpdateList( (*it3)->GetAABB() , (*it2)->GetAABB() );
+					}
+					tempScanList.push_back( (*it2) );
 
-			float maxX1 = pAABB1->maxElement->GetX();
-			float maxY1 = pAABB1->maxElement->GetY();
-			float maxZ1 = pAABB1->maxElement->GetZ();
-			
-			float minX2 = pAABB2->minElement->GetX();
-			float minY2 = pAABB2->minElement->GetY();
-			float minZ2 = pAABB2->minElement->GetZ();
+				}
+			}
+			it2 = Element::ElementListY().begin();
+			for (; it2 != Element::ElementListY().end(); ++it2) {
+				if( (*it2)->GetIsMax()) {
+					
+					tempScanList.remove( ((*it2)->GetAABB())->GetMinElement() );
+				} else {
+				
+					it3 = tempScanList.begin();
+					for(; it3 != tempScanList.end(); ++it3) {
+						
+						Overlap::UpdateList( (*it3)->GetAABB() , (*it2)->GetAABB() );
+					}
+					tempScanList.push_back( (*it2) );
 
-			float maxX2 = pAABB2->maxElement->GetX();
-			float maxY2 = pAABB2->maxElement->GetY();
-			float maxZ2 = pAABB2->maxElement->GetZ();
-
-			bool xOverlap = false;
-			bool yOverlap = false;
-			bool zOverlap = false;
-
-			if( (minX1 < minX2) && (maxX1 > minX2) ) { 
-				xOverlap = true;
-			}
-			if( (minX2 < minX1) && ( maxX2 > minX1) ) {
-				xOverlap = true;
-			}
-			if( (minX1 < minX2) && ( maxX1 < minX2 ) {
-				xOverlap = true;
-			}
-			if( (minX2 < minX1) && ( maxX2 < minX1 ) {
-				xOverlap = true;
-			}
-
-			if( (minY1 < minY2) && (maxY1 > minY2) ) { 
-				yOverlap = true;
-			}
-			if( (minY2 < minY1) && ( maxY2 > minY1) ) {
-				yOverlap = true;
-			}
-			if( (minY1 < minY2) && ( maxY1 < minY2 ) {
-				yOverlap = true;
-			}
-			if( (minY2 < minY1) && ( maxY2 < minY1 ) {
-				yOverlap = true;
+				}
+				
 			}
 
-			if( (minZ1 < minZ2) && (maxZ1 > minZ2) ) { 
-				zOverlap = true;
-			}
-			if( (minZ2 < minZ1) && ( maxZ2 > minZ1) ) {
-				zOverlap = true;
-			}
-			if( (minZ1 < minZ2) && ( maxZ1 < minZ2 ) {
-				zOverlap = true;
-			}
-			if( (minZ2 < minZ1) && ( maxZ2 < minZ1 ) {
-				zOverlap = true;
+			it2 = Element::ElementListZ().begin();
+			for (; it2 != Element::ElementListZ().end(); ++it2) {
+				if( (*it2)->GetIsMax()) {
+					
+					tempScanList.remove( ((*it2)->GetAABB())->GetMinElement() );
+				} else {
+					
+					it3 = tempScanList.begin();
+					for(; it3 != tempScanList.end(); ++it3) {
+						
+						Overlap::UpdateList( (*it3)->GetAABB() , (*it2)->GetAABB() );
+					}
+					tempScanList.push_back( (*it2) );
+
+				}
+				
 			}
 
-		}*/
+
+		}
+		static void Response(void (*pFunc) (AABB* p1, AABB* p2) ) {
+			std::list< void (*) (AABB*, AABB*) > functionList;
+			std::list< std::pair < AABB*, AABB* >* > pairList;
+			std::list< Overlap* >::iterator it = Overlap::OverlapList().begin();
+			for (; it != Overlap::OverlapList().end(); ++it) {
+				if( (*it)->IsCollision() ) {
+					AABB* aabb1 = (*it)->GetFirstAABB();
+					AABB* aabb2 = (*it)->GetSecondAABB();
+
+					functionList.push_back(pFunc);
+					pairList.push_back(new std::pair< AABB*, AABB* > (aabb1, aabb2) );
+				}
+			}
+			if( functionList.empty() ){
+				return;
+			} else {
+				std::list< void (*) (AABB*, AABB*) >::iterator itFunc = functionList.begin();
+				AABB* temp1;
+				AABB* temp2;
+				for( ; itFunc != functionList.end(); ++itFunc ) {
+					temp1 = (pairList.front())->first;
+					temp2 = (pairList.front())->second;
+					pairList.pop_front();
+					(pFunc)(temp1, temp2);
+				}
+			}
+		}
 	};
 
-	
 
-	
-	
+
+	void push(AABB* aabb1, AABB* aabb2);
 
 	enum DIRECTION_OF_TRAVEL { XNEG, XPOS, YNEG, YPOS, ZNEG, ZPOS, NONE }; // these are the directions the ToyBlocks can moving in
 
@@ -176,14 +239,17 @@ namespace SweepAndPrune {
 		  void MoveX(GLfloat x) {
 			  Vector3 delta(x, 0, 0);
 			  Move(delta);
+			  AABB::Response( push );
 		  }
 		  void MoveY(GLfloat y) {
-				Vector3 delta(0, y, 0);
-				Move(delta);
+			  Vector3 delta(0, y, 0);
+			  Move(delta);
+			   AABB::Response( push );
 		  }
 		  void MoveZ(GLfloat z) {
-				Vector3 delta(0, 0, z);
-				Move(delta);
+			  Vector3 delta(0, 0, z);
+			  Move(delta);
+			   AABB::Response( push );
 		  }
 		  void Draw(){
 			  GLfloat minX = minElement->GetX();
@@ -233,6 +299,7 @@ namespace SweepAndPrune {
 	private:
 		DIRECTION_OF_TRAVEL lastDirection; // records the direction that the cube is try to move in	
 		const GLfloat* colour; // colour of the ToyBlocks
+
 	};
 
 

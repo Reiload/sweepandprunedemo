@@ -12,13 +12,14 @@ namespace SweepAndPrune {
 	public:
 		Element(AABB* ptaabb, Vector3 vec, bool isMax1) : ptAABB(ptaabb), coordinates(vec), isMax(isMax1) {
 			InsertIntoList(this, isMax1);
+		
 		}
-		Element* GetSmallerElementX() const { return smallerElements[0]; }
-		Element* GetSmallerElementY() const { return smallerElements[1]; }
-		Element* GetSmallerElementZ() const { return smallerElements[2]; }
-		Element* GetGreaterElementX() const { return greaterElements[0]; }
-		Element* GetGreaterElementY() const { return greaterElements[1]; }
-		Element* GetGreaterElementZ() const { return greaterElements[2]; }
+		inline Element* GetSmallerElementX() const { return smallerElements[0]; }
+		inline Element* GetSmallerElementY() const { return smallerElements[1]; }
+		inline Element* GetSmallerElementZ() const { return smallerElements[2]; }
+		inline Element* GetGreaterElementX() const { return greaterElements[0]; }
+		inline Element* GetGreaterElementY() const { return greaterElements[1]; }
+		inline Element* GetGreaterElementZ() const { return greaterElements[2]; }
 		float GetX() const { return coordinates.GetX(); }
 		float GetY() const { return coordinates.GetY(); }
 		float GetZ() const { return coordinates.GetZ(); }
@@ -40,7 +41,13 @@ namespace SweepAndPrune {
 			return isMax;
 		}
 
-static void InsertIntoList(Element* elem, bool isMax) {
+		static void InsertIntoList(Element* elem, bool isMax) {
+			if( ElementListX().empty() ) {
+				ElementListX().push_back(elem);
+				ElementListY().push_back(elem);
+				ElementListZ().push_back(elem);
+				return;
+			}
 			std::list<Element*>::iterator it = ElementListX().begin();
 			if(isMax) {
 				for (; it != ElementListX().end(); ) {
@@ -49,7 +56,7 @@ static void InsertIntoList(Element* elem, bool isMax) {
 						break;
 					}
 					++it;
-					if( it != ElementListX().end() ) {
+					if( it == ElementListX().end() ) {
 						ElementListX().insert(it, elem);
 						break;
 					}
@@ -61,7 +68,7 @@ static void InsertIntoList(Element* elem, bool isMax) {
 						break;
 					}
 					++it;
-					if( it != ElementListY().end() ) {
+					if( it == ElementListY().end() ) {
 						ElementListY().insert(it, elem);
 						break;
 					}
@@ -73,7 +80,7 @@ static void InsertIntoList(Element* elem, bool isMax) {
 						break;
 					}
 					++it;
-					if( it != ElementListZ().end() ) {
+					if( it == ElementListZ().end() ) {
 						ElementListZ().insert(it, elem);
 						break;
 					}
@@ -85,7 +92,7 @@ static void InsertIntoList(Element* elem, bool isMax) {
 						break;
 					}
 					++it;
-					if( it != ElementListX().end() ) {
+					if( it == ElementListX().end() ) {
 						ElementListX().insert(it, elem);
 						break;
 					}
@@ -97,7 +104,7 @@ static void InsertIntoList(Element* elem, bool isMax) {
 						break;
 					}
 					++it;
-					if( it != ElementListY().end() ) {
+					if( it == ElementListY().end() ) {
 						ElementListY().insert(it, elem);
 						break;
 					}
@@ -109,7 +116,7 @@ static void InsertIntoList(Element* elem, bool isMax) {
 						break;
 					}
 					++it;
-					if( it != ElementListZ().end() ) {
+					if( it == ElementListZ().end() ) {
 						ElementListZ().insert(it, elem);
 						break;
 					}
@@ -121,13 +128,6 @@ static void InsertIntoList(Element* elem, bool isMax) {
 			ElementListY().remove(elem);
 			ElementListZ().remove(elem);
 		}
-
-	private:
-		AABB* ptAABB;
-		Element* smallerElements[3];
-		Element* greaterElements[3];
-		Vector3 coordinates;
-		bool isMax;
 		static std::list<Element*>&  ElementListX() {	
 			static std::list<Element*> ElementListX;	// static list of all Element Objects with respect to the x axis
 			return ElementListX;
@@ -140,7 +140,12 @@ static void InsertIntoList(Element* elem, bool isMax) {
 			static std::list<Element*> ElementListZ;	// static list of all Element Objects with respect to the Z axis
 			return ElementListZ;
 		}
-		
+	private:
+		AABB* ptAABB;
+		Element* smallerElements[3];
+		Element* greaterElements[3];
+		Vector3 coordinates;
+		bool isMax;
 	};
 
 
