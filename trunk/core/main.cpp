@@ -21,7 +21,6 @@
 #include "shadow.h"
 #include "l3ds.h"
 #include "screenobject.h"
-#include "utilities.h"
 
 
 using namespace SweepAndPrune;

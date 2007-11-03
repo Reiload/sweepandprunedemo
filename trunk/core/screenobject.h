@@ -19,7 +19,6 @@ This implementation has been designed for the use of the sweep and prune collisi
 #include "gl.h"
 #include "glu.h"
 #include "glut.h"
-#include "utilities.h"
 #include "csc3406.h"
 #include "l3ds.h"
 #include "element.h"
