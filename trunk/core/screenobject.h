@@ -101,8 +101,9 @@ namespace SweepAndPrune {
 		inline Element* GetMaxElement() const {
 			return maxElement;
 		}
-		inline void Move(const Vector3 newPosition) {
-			UpdateList(this, newPosition);
+		inline void Move(const Vector3 delta) {
+			directionOfTravel = delta;
+			UpdateList(this, delta);
 		}
 		inline Vector3* CreatePositionVector() const {
 			return new Vector3(
@@ -117,10 +118,14 @@ namespace SweepAndPrune {
 		inline void SetMovable() {
 			movable = true;
 		}
+		inline Vector3 GetDirectionOfTravel() const {
+			return directionOfTravel;
+		}
 	protected:
 		Element* minElement;
 		Element* maxElement;
 		bool movable;
+		Vector3 directionOfTravel;
 
 		static void UpdateList(AABB* pAABB, const Vector3 deltaPosition) {
 			Element* tempElement;
@@ -231,6 +236,8 @@ namespace SweepAndPrune {
 
 	enum DIRECTION_OF_TRAVEL { XNEG, XPOS, YNEG, YPOS, ZNEG, ZPOS, NONE }; // these are the directions the ToyBlocks can moving in
 
+
+
 	class ToyBlocks : public AABB{
 	public:
 		ToyBlocks(const Vector3 mins1, const Vector3 maxs1, const GLfloat* col) : 
@@ -292,6 +299,7 @@ namespace SweepAndPrune {
 			  glVertex3f(maxX, maxY, minZ);
 
 			  glEnd();
+			  
 			  glPopMatrix();
 		  }
 		  void SetDirectionOfTravel(DIRECTION_OF_TRAVEL dir) {lastDirection = dir;}
