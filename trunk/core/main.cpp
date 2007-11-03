@@ -1,10 +1,11 @@
-/* main.cpp 
+/*	main.cpp 
 
-	CSC3406 Assignment 3
-	Author: Ben Gilbert W0062289
-	4 June 2007
+	Ben Gilbert W0062289
+	3 November 2007
 
-	Aquarium scene with reflection and shadows
+	CSC8490 Assignment 2
+
+	Demonstrates an implementation of the sweep and algorithm for collision detection
 
 */
 
@@ -37,13 +38,15 @@ FileReadWriter fileHandler;
 WindowSetup settings;
 
 /*** Global Variables ***/
-GLfloat colors1[4] = {0.8, 0.0, 0.0, 1.0};
+
+// The ToyBlocks displayed
+GLfloat colors1[4] = {0.5, 0.0, 0.0, 1.0};
 ToyBlocks ToyBlocks1(Vector3(1.0, 1.0, 1.0), Vector3(2.0, 2.0, 2.0), colors1);
 
-
-GLfloat colors2[4] = {0.8, 0.8, 0.0, 1.0};
+GLfloat colors2[4] = {0.5, 0.5, 0.0, 1.0};
 ToyBlocks ToyBlocks2(Vector3(-2.0, 1.0, 1.0), Vector3(-1.0, 2.0, 2.0), colors2);
 
+// The distance moved in one increment (key press)
 const GLfloat INC = 0.2;
 
 // Window Dimensions
@@ -67,15 +70,13 @@ const GLfloat LOOK_X = 0.0;
 const GLfloat LOOK_Y = 2.0;
 const GLfloat LOOK_Z = 0.0;
 
-// Aquarium floor OpenGL variables
+// Floor OpenGL variables
 const GLfloat FLOOR_MATERIAL_SHININESS[] = {90.0f};
 GLfloat FLOOR_MATERIAL_AMBIENT[] = {0.0, 0.8, 0.8, 0.8f};
 GLfloat FLOOR_COLOR[] = {0.0f, 1.0f, 1.0f, 0.8f};
 GLfloat FLOOR_NORMAL[] = {0.0f, 1.0f, 0.0f};
 
-
-
-/*** Draw Aquarium Floor ***/
+/*** Draw Floor ***/
 void drawFloor(void) {
 	glPushMatrix();
 		glColor4fv(FLOOR_COLOR);
@@ -104,7 +105,7 @@ void myReshape(int w, int h)
 	glMatrixMode(GL_MODELVIEW);  
 }
 
-/*** Draw Aquarium Scene ***/
+/*** Draw Scene ***/
 void render(void)
 {
 	GLdouble P[5][3];
@@ -181,7 +182,7 @@ void render(void)
 	glDisable(GL_BLEND);
 	glEnable(GL_LIGHTING);
 
-	// Draw foreground coral and fish projected on to floor
+	// Draw objects to screen
 	// Also draw to stencil buffer
 	glDisable(GL_DEPTH_TEST);
 	glPushMatrix();
@@ -190,7 +191,6 @@ void render(void)
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		ToyBlocks1.Draw();
 		ToyBlocks2.Draw();
-	//	drawObjects();
 	glPopMatrix();
 
 	// Redraw floor where projected foreground objects were drawn
@@ -207,7 +207,7 @@ void render(void)
 	
 }
 
-/*** Draw Aquarium Scene and swap buffers ***/
+/*** Draw Scene and swap buffers ***/
 void myDisplay(void) {
 	render();
 	glFlush();
@@ -217,28 +217,15 @@ void myDisplay(void) {
 
 void mySpecialKeyboardFunc(int key, int x, int y)
 {
-	if(key == GLUT_KEY_LEFT)
-	{
-		
+	if(key == GLUT_KEY_LEFT) {}
+	else if(key == GLUT_KEY_RIGHT) {}
+	else if(key == GLUT_KEY_UP) {
+		ToyBlocks1.MoveY(INC);	
 	}
-	else if(key == GLUT_KEY_RIGHT)
-	{
-		
+	else if(key == GLUT_KEY_DOWN) {
+		ToyBlocks1.MoveY(-INC);	
 	}
-	else if(key == GLUT_KEY_UP)
-	{
-			ToyBlocks1.MoveY(INC);
-			ToyBlocks1.SetDirectionOfTravel(YPOS);
-			
-	}
-	else if(key == GLUT_KEY_DOWN)
-	{
-			ToyBlocks1.MoveY(-INC);
-			ToyBlocks1.SetDirectionOfTravel(YNEG);
-			
-	}
-	glutPostRedisplay();
-	
+	glutPostRedisplay();	
 }
 
 /*** Handle Keyboard ***/
@@ -247,49 +234,41 @@ void myKeyboard(unsigned char c, int x, int y)
 	switch (c)
 	{
 		case 'w' : 
-			ToyBlocks1.MoveZ(-INC);
-			ToyBlocks1.SetDirectionOfTravel(ZNEG);
+			ToyBlocks1.MoveZ(-INC);	
 			break;
 		case 'W' :
 			ToyBlocks1.MoveZ(-INC);
-			ToyBlocks1.SetDirectionOfTravel(ZNEG);
 			break;
 		case 's' : 
-			ToyBlocks1.MoveZ(INC);
-			ToyBlocks1.SetDirectionOfTravel(ZPOS);
+			ToyBlocks1.MoveZ(INC);	
 			break;
 		case 'S' :
 			ToyBlocks1.MoveZ(INC);
-			ToyBlocks1.SetDirectionOfTravel(ZPOS);
 			break;
 		case 'a' :
 			ToyBlocks1.MoveX(-INC);
-			ToyBlocks1.SetDirectionOfTravel(XNEG);
 			break;
 		case 'A' :
 			ToyBlocks1.MoveX(-INC);
-			ToyBlocks1.SetDirectionOfTravel(XNEG);
 			break;
 		case 'd' :
 			ToyBlocks1.MoveX(INC);
-			ToyBlocks1.SetDirectionOfTravel(XPOS);
 			break;
 		case 'D' :
 			ToyBlocks1.MoveX(INC);
-			ToyBlocks1.SetDirectionOfTravel(XPOS);
 			break;
-	case 27:
-		exit(0);
-		break;
-	case 'p':
-		fileHandler.captureScreen(settings.SCREENWIDTH, settings.SCREENHEIGHT,"capture.bmp");
-		break;
-	case 'P':
-		fileHandler.captureScreen(settings.SCREENWIDTH, settings.SCREENHEIGHT,"capture.bmp");
-		break;
-	default:
-		break;
-	}
+		case 27:
+			exit(0);
+			break;
+		case 'p':
+			fileHandler.captureScreen(settings.SCREENWIDTH, settings.SCREENHEIGHT,"capture.bmp");
+			break;
+		case 'P':
+			fileHandler.captureScreen(settings.SCREENWIDTH, settings.SCREENHEIGHT,"capture.bmp");
+			break;
+		default:
+			break;
+		}
 	glutPostRedisplay();
 }
 
@@ -340,14 +319,7 @@ int main()
 	N[1] = 0.0;
 	N[2] = 0.3;
 
-	
-	ToyBlocks2.SetMovable();
-	//// Create 3 Fish objects
-	//Fish::File("Fish.3ds");
-	//new Fish(Vector3(1.0, 1.1, 1.0), Vector3(1, 0.01, 0.01), 0.05, 0.1, colors1);
-	//new Fish(Vector3(1.0, 1.1, -1.0), Vector3(0.1, 0.1, 0.1), 0.05, 0.04, colors2);
-	//new Fish(Vector3(-1.0, 1.5, 0.0), Vector3(0.1, 0.1, 0.1), 0.01, 0.3, colors3);
-	
+	ToyBlocks2.SetMovable(); // ToyBlocks1 is the "cursor" let the over block be movable by the cursor
 	
 	glutMainLoop();
 	return 0;
