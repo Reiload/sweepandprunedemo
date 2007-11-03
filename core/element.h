@@ -11,7 +11,7 @@ namespace SweepAndPrune {
 	class Element{
 	public:
 		Element(AABB* ptaabb, Vector3 vec, bool isMax1) : ptAABB(ptaabb), coordinates(vec), isMax(isMax1) {
-			PushIntoList(this, isMax1);
+			InsertIntoList(this, isMax1);
 		}
 		Element* GetSmallerElementX() const { return smallerElements[0]; }
 		Element* GetSmallerElementY() const { return smallerElements[1]; }
@@ -31,29 +31,16 @@ namespace SweepAndPrune {
 		void SetGreaterElementX( Element* elem )  {  greaterElements[0] = elem ; }
 		void SetGreaterElementY( Element* elem )  {  greaterElements[1] = elem ; }
 		void SetGreaterElementZ( Element* elem )  {  greaterElements[2] = elem ; }
+
 		void  SetX( float  value )  {  coordinates.SetX(value); }
 		void  SetY( float  value )  {  coordinates.SetY(value); }
 		void  SetZ( float  value )  {  coordinates.SetZ(value); }
 
-	private:
-		AABB* ptAABB;
-		Element* smallerElements[3];
-		Element* greaterElements[3];
-		Vector3 coordinates;
-		bool isMax;
-		static std::list<Element*>&  ElementListX() {	
-			static std::list<Element*> ElementListX;	// static list of all Element Objects with respect to the x axis
-			return ElementListX;
+		inline bool GetIsMax() const {
+			return isMax;
 		}
-		static std::list<Element*>&  ElementListY() {	
-			static std::list<Element*> ElementListY;	// static list of all Element Objects with respect to the Y axis
-			return ElementListY;
-		}	
-		static std::list<Element*>&  ElementListZ() {	
-			static std::list<Element*> ElementListZ;	// static list of all Element Objects with respect to the Z axis
-			return ElementListZ;
-		}
-		static void PushIntoList(Element* elem, bool isMax) {
+
+static void InsertIntoList(Element* elem, bool isMax) {
 			std::list<Element*>::iterator it = ElementListX().begin();
 			if(isMax) {
 				for (; it != ElementListX().end(); ) {
@@ -129,6 +116,31 @@ namespace SweepAndPrune {
 				}
 			}
 		}
+		static void RemoveFromList(Element* elem) {
+			ElementListX().remove(elem);
+			ElementListY().remove(elem);
+			ElementListZ().remove(elem);
+		}
+
+	private:
+		AABB* ptAABB;
+		Element* smallerElements[3];
+		Element* greaterElements[3];
+		Vector3 coordinates;
+		bool isMax;
+		static std::list<Element*>&  ElementListX() {	
+			static std::list<Element*> ElementListX;	// static list of all Element Objects with respect to the x axis
+			return ElementListX;
+		}
+		static std::list<Element*>&  ElementListY() {	
+			static std::list<Element*> ElementListY;	// static list of all Element Objects with respect to the Y axis
+			return ElementListY;
+		}	
+		static std::list<Element*>&  ElementListZ() {	
+			static std::list<Element*> ElementListZ;	// static list of all Element Objects with respect to the Z axis
+			return ElementListZ;
+		}
+		
 	};
 
 

@@ -185,6 +185,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\element.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\csc3406\l3ds.cpp"
 				>
 			</File>
