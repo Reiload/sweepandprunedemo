@@ -1,7 +1,9 @@
-/*	screenobject.cpp - implementation file for Fish class
+/*	screenobject.cpp - implementation file for AABB class
 
-Author: Ben Gilbert W0062289
-CSC3406 Assignment 2
+Ben Gilbert W0062289
+3 November 2007
+
+CSC8490 Assignment 2
 
 */
 
@@ -10,9 +12,10 @@ CSC3406 Assignment 2
 #include "screenobject.h"
 #include "l3ds.h"
 
+
 using namespace SweepAndPrune;
 
-
+/* push a "response" function that allows the player to push the other AABB */
 void SweepAndPrune::push(AABB* aabb1, AABB* aabb2) {
 	Vector3* pos1 = aabb1->CreatePositionVector();
 	Vector3* pos2 = aabb2->CreatePositionVector();
