@@ -26,7 +26,6 @@ namespace SweepAndPrune {
 	/* An element object defines a maximum or minimum vertice of an axis aligned bounding box */
 	class Element{
 	public:
-		Element() {}
 		Element(AABB* ptaabb, Vector3 vec, bool isMax1) : 
 		  ptAABB(ptaabb), coordinates(vec), isMax(isMax1) {
 			  InsertIntoList(this, isMax1);
