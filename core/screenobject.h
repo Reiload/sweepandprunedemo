@@ -160,20 +160,58 @@ namespace SweepAndPrune {
 		static void UpdateList(AABB* pAABB, const Vector3 deltaPosition) {
 			Element* tempElement;
 			tempElement = pAABB->GetMinElement();
-			Element::RemoveFromList(tempElement);
+			std::cout << "Update List pAABB " << pAABB << "minElement* " << tempElement << std::endl;
+			std::cout << "delta vector (" << deltaPosition.GetX() << " ,"
+				<< deltaPosition.GetY() << " ," << deltaPosition.GetZ() << ")" << std::endl;
+				GLfloat minX = tempElement->GetX();
+			  GLfloat minY = tempElement->GetY();
+			  GLfloat minZ = tempElement->GetZ();
+			  GLfloat maxX = tempElement->GetX();
+			  GLfloat maxY = tempElement->GetY();
+			  GLfloat maxZ = tempElement->GetZ();
+			std::cout << "Pre Add Min Element: (" << minX << ", " << minY << ", " << minZ << ", "
+				  << ") ( " << maxX << ", " << maxY << ", " << maxZ << ") AABB" <<  pAABB << std::endl; 
+
 			tempElement->SetX( tempElement->GetX() + deltaPosition.GetX() );
 			tempElement->SetY( tempElement->GetY() + deltaPosition.GetY() );
 			tempElement->SetZ( tempElement->GetZ() + deltaPosition.GetZ() );
+			Element::RemoveFromList(tempElement);
 			Element::InsertIntoList(tempElement, tempElement->GetIsMax());
+
+				 minX = tempElement->GetX();
+			   minY = tempElement->GetY();
+			   minZ = tempElement->GetZ();
+			 
+			std::cout << "Post Add Min Element: (" << minX << ", " << minY << ", " << minZ << ", "
+				  << ") AABB" <<  pAABB << std::endl; 
 
 			tempElement = pAABB->GetMaxElement();
-			Element::RemoveFromList(tempElement);
+				minX = tempElement->GetX();
+			   minY = tempElement->GetY();
+			   minZ = tempElement->GetZ();
+			   maxX = tempElement->GetX();
+			   maxY = tempElement->GetY();
+			   maxZ = tempElement->GetZ();
+			std::cout << "Pre Add Max Element: (" << minX << ", " << minY << ", " << minZ << ", "
+				  << ") AABB" <<  pAABB << std::endl; 
+
+		
 			tempElement->SetX( tempElement->GetX() + deltaPosition.GetX() );
 			tempElement->SetY( tempElement->GetY() + deltaPosition.GetY() );
 			tempElement->SetZ( tempElement->GetZ() + deltaPosition.GetZ() );
+				tempElement = pAABB->GetMaxElement();
+				minX = tempElement->GetX();
+			   minY = tempElement->GetY();
+			   minZ = tempElement->GetZ();
+			   maxX = tempElement->GetX();
+			   maxY = tempElement->GetY();
+			   maxZ = tempElement->GetZ();
+			std::cout << "Post Add Max Element: (" << minX << ", " << minY << ", " << minZ << ", "
+				  << ") AABB" <<  pAABB << std::endl; 
+			Element::RemoveFromList(tempElement);
 			Element::InsertIntoList(tempElement, tempElement->GetIsMax());
 			DetectCollisions();
-
+			glutPostRedisplay();
 		}
 		/* DetectColllisions scans the element lists and searches for collisions
 		according to the sweep and prune algorithm */
@@ -191,14 +229,22 @@ namespace SweepAndPrune {
 			// scan the x axis
 			for (; elementListIt != Element::ElementListX().end(); ++elementListIt) {	
 				if( (*elementListIt)->GetIsMax()) { // true if element is a maximum
+					std::cout << "Processing x max value of " << (*elementListIt)->GetX() << std::endl;
+					std::cout << "tempScanList size was " << tempScanList.size() << std::endl;
 					tempScanList.remove( ((*elementListIt)->GetAABB())->GetMinElement() ); // remove corresponding minimum element
+					std::cout << "tempScanList size is now " << tempScanList.size() << std::endl;
 				} else { // true if element is a minimum
 					tempListIt = tempScanList.begin();
 					for(; tempListIt != tempScanList.end(); ++tempListIt) { 
 						// mark overlaps between this elements AABB and the AABBs of the elements in the list
+					/*	if( tempScanList.back()->GetX() == (*elementListIt)->GetX() ) {
+							tempScanList.pop_back(); 
+							break;
+						}*/
 						Overlap::UpdateList( (*tempListIt)->GetAABB() , (*elementListIt)->GetAABB() );
 					}
 					tempScanList.push_back( (*elementListIt) );
+					std::cout << "Pushing x min value of " << (*elementListIt)->GetX() << std::endl;
 				}
 			}
 
@@ -259,12 +305,16 @@ namespace SweepAndPrune {
 		  }
 		  /* MoveX moves ToyBlock in the x direction */
 		  void MoveX(GLfloat x) {
+			  std::cout << std::endl;
+			  std::cout << "Key Press" << std::endl;
 			  Vector3 delta(x, 0, 0);
 			  Move(delta);
 			  AABB::Response( push );
 		  }
 		  /* MoveY moves ToyBlock in the x direction */
 		  void MoveY(GLfloat y) {
+			  std::cout << std::endl;
+			  std::cout << "Key Press" << std::endl;
 			  Vector3 delta(0, y, 0);
 			  Move(delta);
 			  AABB::Response( push );
@@ -283,6 +333,9 @@ namespace SweepAndPrune {
 			  GLfloat maxX = maxElement->GetX();
 			  GLfloat maxY = maxElement->GetY();
 			  GLfloat maxZ = maxElement->GetZ();
+
+			/*  std::cout << "Block: (" << minX << ", " << minY << ", " << minZ << ", "
+				  << ") ( " << maxX << ", " << maxY << ", " << maxZ << ")" << std::endl; */
 
 			  glPushMatrix();
 			  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, colour);
