@@ -8,7 +8,6 @@ CSC8490 Assignment 2
 */
 
 #include "glut.h"
-#include "utilities.h"
 #include "screenobject.h"
 #include "l3ds.h"
 
