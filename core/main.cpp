@@ -46,7 +46,7 @@ GLfloat colors2[4] = {0.5, 0.5, 0.0, 1.0};
 ToyBlocks ToyBlocks2(Vector3(-2.0, 1.0, 1.0), Vector3(-1.0, 2.0, 2.0), colors2);
 
 // The distance moved in one increment (key press)
-const GLfloat INC = 0.2;
+const GLfloat INC = 0.1;
 
 // Window Dimensions
 int windowWidth, windowHeight;
