@@ -1,0 +1,1 @@
+A demonstration of the use of the Sweep-And-Prune collision detection algorithm.  Uses code from Christer Ericson's Book: "Real-Time Collision Detection"
